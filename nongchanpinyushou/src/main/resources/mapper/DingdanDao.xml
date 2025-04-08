@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.DingdanDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.dipi_order_id as dipiOrderId
+        ,a.kehu_id as kehuId
+        ,a.dingdan_wupin as dingdanWupin
+        ,a.wupin_number as wupinNumber
+        ,a.xingming as xingming
+        ,a.shouhuoren_phone as shouhuorenPhone
+        ,a.address as address
+        ,a.dingdan_danhao_number as dingdanDanhaoNumber
+        ,a.zuowuzhuangtai_content as zuowuzhuangtaiContent
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.DingdanView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,dipiOrder.dipi_id as dipiId
+        ,dipiOrder.kehu_id as kehuId
+        ,dipiOrder.zuowu_name as zuowuName
+        ,dipiOrder.zuowu_types as zuowuTypes
+        ,dipiOrder.insert_time as insertTime
+        ,dipiOrder.dipi_order_yesno_types as dipiOrderYesnoTypes
+        ,kehu.kehu_name as kehuName
+        ,kehu.kehu_phone as kehuPhone
+        ,kehu.kehu_id_number as kehuIdNumber
+        ,kehu.kehu_address as kehuAddress
+        ,kehu.kehu_time as kehuTime
+        ,kehu.kehu_photo as kehuPhoto
+
+        FROM dingdan  a
+        left JOIN dipi_order dipiOrder ON a.dipi_order_id = dipiOrder.id
+        left JOIN kehu kehu ON a.kehu_id = kehu.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.dipiOrderId != null">
+                and a.dipi_order_id = #{params.dipiOrderId}
+            </if>
+            <if test="params.kehuId != null">
+                and a.kehu_id = #{params.kehuId}
+            </if>
+            <if test=" params.dingdanWupin != '' and params.dingdanWupin != null and params.dingdanWupin != 'null' ">
+                and a.dingdan_wupin like CONCAT('%',#{params.dingdanWupin},'%')
+            </if>
+            <if test="params.wupinNumberStart != null">
+                <![CDATA[  and a.wupin_number >= #{params.wupinNumberStart}   ]]>
+            </if>
+            <if test="params.wupinNumberEnd != null">
+                <![CDATA[  and a.wupin_number <= #{params.wupinNumberEnd}   ]]>
+            </if>
+            <if test=" params.xingming != '' and params.xingming != null and params.xingming != 'null' ">
+                and a.xingming like CONCAT('%',#{params.xingming},'%')
+            </if>
+            <if test=" params.shouhuorenPhone != '' and params.shouhuorenPhone != null and params.shouhuorenPhone != 'null' ">
+                and a.shouhuoren_phone like CONCAT('%',#{params.shouhuorenPhone},'%')
+            </if>
+            <if test=" params.address != '' and params.address != null and params.address != 'null' ">
+                and a.address like CONCAT('%',#{params.address},'%')
+            </if>
+            <if test=" params.dingdanDanhaoNumber != '' and params.dingdanDanhaoNumber != null and params.dingdanDanhaoNumber != 'null' ">
+                and a.dingdan_danhao_number like CONCAT('%',#{params.dingdanDanhaoNumber},'%')
+            </if>
+            <if test=" params.zuowuzhuangtaiContent != '' and params.zuowuzhuangtaiContent != null and params.zuowuzhuangtaiContent != 'null' ">
+                and a.zuowuzhuangtai_content like CONCAT('%',#{params.zuowuzhuangtaiContent},'%')
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+            <if test="params.dipiId != null">
+                and dipiOrder.dipi_id = #{params.dipiId}
+            </if>
+            <if test="params.kehuId != null">
+                and dipiOrder.kehu_id = #{params.kehuId}
+            </if>
+            <if test=" params.zuowuName != '' and params.zuowuName != null and params.zuowuName != 'null' ">
+                and dipiOrder.zuowu_name like CONCAT('%',#{params.zuowuName},'%')
+            </if>
+            <if test="params.zuowuTypes != null">
+                and dipiOrder.zuowu_types = #{params.zuowuTypes}
+            </if>
+
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(dipiOrder.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(dipiOrder.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.dipiOrderYesnoTypes != null">
+                and dipiOrder.dipi_order_yesno_types = #{params.dipiOrderYesnoTypes}
+            </if>
+
+            <if test=" params.kehuName != '' and params.kehuName != null and params.kehuName != 'null' ">
+                and kehu.kehu_name like CONCAT('%',#{params.kehuName},'%')
+            </if>
+            <if test=" params.kehuPhone != '' and params.kehuPhone != null and params.kehuPhone != 'null' ">
+                and kehu.kehu_phone like CONCAT('%',#{params.kehuPhone},'%')
+            </if>
+            <if test=" params.kehuIdNumber != '' and params.kehuIdNumber != null and params.kehuIdNumber != 'null' ">
+                and kehu.kehu_id_number like CONCAT('%',#{params.kehuIdNumber},'%')
+            </if>
+            <if test=" params.kehuAddress != '' and params.kehuAddress != null and params.kehuAddress != 'null' ">
+                and kehu.kehu_address like CONCAT('%',#{params.kehuAddress},'%')
+            </if>
+            <if test=" params.kehuTimeStart != '' and params.kehuTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(kehu.kehu_time) >= UNIX_TIMESTAMP(#{params.kehuTimeStart}) ]]>
+            </if>
+            <if test=" params.kehuTimeEnd != '' and params.kehuTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(kehu.kehu_time) <= UNIX_TIMESTAMP(#{params.kehuTimeEnd}) ]]>
+            </if>
+        </where>
+        order by a.${params.orderBy} desc
+    </select>
+
+</mapper>
